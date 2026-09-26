@@ -6,11 +6,13 @@ using System.Text;
 
 namespace App.Database
 {
-    internal class AppContext: DbContext
+    public class AppContext : DbContext
     {
-        public DbSet<Product> Products { get; set; }
+        public AppContext(DbContextOptions<AppContext> options)
+        : base(options)
+        {
+        }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseNpgsql($"Data Source=pgsql;Database=mydb");
+        public DbSet<Product> Products { get; set; }
     }
 }

@@ -7,6 +7,12 @@ namespace AspireApp.Server.Controllers
     [Route("api/products")]
     public class ProductController : ControllerBase
     {
+        private readonly App.Database.AppContext _context;
+
+        public ProductController(App.Database.AppContext context)
+        {
+            _context = context;
+        }
         [HttpGet]
         public IEnumerable<Product> GetProducts()
         {
@@ -37,6 +43,8 @@ namespace AspireApp.Server.Controllers
         [HttpPost]
         public Product NewProduct([FromBody] Product product)
         {
+            _context.Products.Add(product);
+            _context.SaveChanges();
             // For demonstration purposes, return the same product.
             return product;
         }
