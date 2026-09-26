@@ -15,7 +15,7 @@ namespace App.Database
         {
         }
 
-        public DbSet<Product> Products { get; set; }
+        internal DbSet<Product> Products { get; set; }
         public override int SaveChanges(bool acceptAllChangesOnSuccess)
         {
             ValidateErrors();

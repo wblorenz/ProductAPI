@@ -1,31 +1,25 @@
-﻿using App.Model;
+﻿using App.Model.Repositories;
 using AspireApp.Server.DTOs;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AspireApp.Server.Controllers
 {
     [ApiController]
     [Route("api/products")]
-    public class ProductController : ControllerBase
+    public class ProductController(IProductRepository productRepository) : ControllerBase
     {
-        private readonly App.Database.AppContext _context;
 
-        public ProductController(App.Database.AppContext context)
-        {
-            _context = context;
-        }
         [HttpGet]
         public async Task<IEnumerable<ProductDTO>> GetProducts()
         {
-            var products = await _context.Products.ToListAsync();
+            var products = await productRepository.GetAllAsync();
             return products.Select(p => new ProductDTO(p));
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDTO>> GetProduct(long id)
         {
-            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var product = await productRepository.GetAsync(id);
             if (product == null)
             {
                 return NotFound();
@@ -37,16 +31,15 @@ namespace AspireApp.Server.Controllers
         public async Task<ProductDTO> NewProduct([FromBody] ProductDTO product)
         {
             var newProduct = product.ToProduct();
-            _context.Products.Add(newProduct);
-            await _context.SaveChangesAsync();
+            productRepository.Add(newProduct);
+            await productRepository.SaveAsync();
             return new ProductDTO(newProduct);
         }
-
 
         [HttpPut("{id}")]
         public async Task<ActionResult<ProductDTO>> UpdateProduct(long id, [FromBody] ProductDTO product)
         {
-            var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var existingProduct = await productRepository.GetAsync(id);
             if (existingProduct == null)
             {
                 return NotFound();
@@ -54,19 +47,20 @@ namespace AspireApp.Server.Controllers
             existingProduct.Description = product.Description;
             existingProduct.Name = product.Name;
             existingProduct.Price = product.Price;
-            await _context.SaveChangesAsync();
+            await productRepository.SaveAsync();
+            product.Id = existingProduct.Id;
             return product;
         }
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(long id)
         {
-            var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var existingProduct = await productRepository.GetAsync(id);
             if (existingProduct == null)
             {
                 return NotFound();
             }
-            _context.Products.Remove(existingProduct);
-            await _context.SaveChangesAsync();
+            productRepository.Delete(existingProduct);
+            await productRepository.SaveAsync();
             return NoContent();
         }
     }

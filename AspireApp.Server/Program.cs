@@ -1,3 +1,4 @@
+using App.Model.Repositories;
 using AspireApp.Server.Handlers;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.AddNpgsqlDbContext<App.Database.AppContext>("mydb");
 builder.Services.AddExceptionHandler<DomainValidationExceptionHandler>();
+builder.Services.AddScoped<IProductRepository, App.Database.Repositories.ProductRepository>();
 
 var app = builder.Build();
 
