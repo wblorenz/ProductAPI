@@ -14,3 +14,5 @@ A product management system built with .NET 10 and .NET Aspire.
 
 - **`App.Test`**: Integration and unit test suite running against isolated PostgreSQL containers using Testcontainers.
   - Never had used Testcontainers before. It seems really powerful. Used a bunch of AI to actually write the tests since I had no experience with it.
+
+To run the application go on the `AspireApp.AppHost` project and run the `dotnet run` command. It will provision a PostgreSQL database and start the application services.
