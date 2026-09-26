@@ -1,4 +1,5 @@
 ﻿using App.Model;
+using AspireApp.Server.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,33 +16,35 @@ namespace AspireApp.Server.Controllers
             _context = context;
         }
         [HttpGet]
-        public async Task<IEnumerable<Product>> GetProducts()
+        public async Task<IEnumerable<ProductDTO>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            var products = await _context.Products.ToListAsync();
+            return products.Select(p => new ProductDTO(p));
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(long id)
+        public async Task<ActionResult<ProductDTO>> GetProduct(long id)
         {
             var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (product == null)
             {
                 return NotFound();
             }
-            return product;
+            return new ProductDTO(product);
         }
 
         [HttpPost]
-        public async Task<Product> NewProduct([FromBody] Product product)
+        public async Task<ProductDTO> NewProduct([FromBody] ProductDTO product)
         {
-            _context.Products.Add(product);
+            var newProduct = product.ToProduct();
+            _context.Products.Add(newProduct);
             await _context.SaveChangesAsync();
-            return product;
+            return new ProductDTO(newProduct);
         }
 
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Product>> UpdateProduct(long id, [FromBody] Product product)
+        public async Task<ActionResult<ProductDTO>> UpdateProduct(long id, [FromBody] ProductDTO product)
         {
             var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
             if (existingProduct == null)
