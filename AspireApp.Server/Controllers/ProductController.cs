@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AspireApp.Server.Controllers
 {
-    [ApiController]                     // 1. Enables API-specific behaviors (like automatic 400 validation)
+    [ApiController]
     [Route("api/products")]
     public class ProductController : ControllerBase
     {
@@ -17,7 +17,6 @@ namespace AspireApp.Server.Controllers
         [HttpGet]
         public async Task<IEnumerable<Product>> GetProducts()
         {
-            // For demonstration purposes, return a dummy product.
             return await _context.Products.ToListAsync();
         }
 
@@ -37,7 +36,6 @@ namespace AspireApp.Server.Controllers
         {
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
-            // For demonstration purposes, return the same product.
             return product;
         }
 
@@ -46,7 +44,7 @@ namespace AspireApp.Server.Controllers
         public async Task<ActionResult<Product>> UpdateProduct(long id, [FromBody] Product product)
         {
             var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if(existingProduct == null)
+            if (existingProduct == null)
             {
                 return NotFound();
             }
@@ -54,15 +52,13 @@ namespace AspireApp.Server.Controllers
             existingProduct.Name = product.Name;
             existingProduct.Price = product.Price;
             await _context.SaveChangesAsync();
-            // For demonstration purposes, return the same product.
             return product;
         }
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteProduct(long id)
         {
-            // For demonstration purposes, do nothing.
             var existingProduct = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
-            if(existingProduct == null)
+            if (existingProduct == null)
             {
                 return NotFound();
             }
