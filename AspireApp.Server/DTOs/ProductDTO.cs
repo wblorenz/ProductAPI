@@ -1,4 +1,4 @@
-﻿using App.Model;
+﻿using App.Model.Entities;
 
 namespace AspireApp.Server.DTOs
 {
@@ -8,6 +8,10 @@ namespace AspireApp.Server.DTOs
         public string Name { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
+        public ProductDTO()
+        {
+
+        }
         public ProductDTO(long id, string name, decimal price, string description)
         {
             Id = id;

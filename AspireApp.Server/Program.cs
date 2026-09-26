@@ -1,3 +1,4 @@
+using AspireApp.Server.Handlers;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.AddNpgsqlDbContext<App.Database.AppContext>("mydb");
+builder.Services.AddExceptionHandler<DomainValidationExceptionHandler>();
 
 var app = builder.Build();
 
