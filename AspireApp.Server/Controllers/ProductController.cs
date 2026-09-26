@@ -61,7 +61,7 @@ namespace AspireApp.Server.Controllers
             }
             productRepository.Delete(existingProduct);
             await productRepository.SaveAsync();
-            return NoContent();
+            return Ok();
         }
     }
 }
