@@ -5,6 +5,9 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -18,6 +21,12 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+    options.RoutePrefix = string.Empty;
+});
 
 
 string[] summaries = ["Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"];
@@ -40,6 +49,7 @@ api.MapGet("weatherforecast", () =>
 app.MapDefaultEndpoints();
 
 app.UseFileServer();
+app.MapControllers();
 
 app.Run();
 

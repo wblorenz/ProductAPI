@@ -1,6 +1,10 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var db = builder.AddPostgres("pgsql").WithDataVolume().AddDatabase("mydb");
+var db = builder.AddPostgres("pgsql")
+    .WithPgWeb()
+    .WithDataVolume()
+    .AddDatabase("mydb");
+
 var server = builder.AddProject<Projects.AspireApp_Server>("server")
     .WithHttpHealthCheck("/health")
     .WithExternalHttpEndpoints()

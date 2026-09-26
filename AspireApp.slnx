@@ -1,4 +1,6 @@
 <Solution>
+  <Project Path="App.Database/App.Database.csproj" />
+  <Project Path="App.Model/App.Model.csproj" />
   <Project Path="AspireApp.AppHost/AspireApp.AppHost.csproj" />
   <Project Path="AspireApp.Server/AspireApp.Server.csproj" />
   <Project Path="frontend/frontend.esproj">
