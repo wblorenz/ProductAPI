@@ -791,4 +791,8 @@
   outline: 3px solid var(--accent-gradient-end);
   outline-offset: 2px;
 }
-
+table, th, td {
+    border: 1px solid white;
+    border-collapse: collapse;
+    padding: 20px;
+}
