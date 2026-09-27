@@ -4,6 +4,8 @@ using App.Model.Exceptions;
 using App.Model.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using AspireApp.Server.Controllers;
+using AspireApp.Server.DTOs;
 using Testcontainers.PostgreSql;
 using AppContext = App.Database.AppContext;
 
@@ -34,6 +36,7 @@ namespace App.Test
             });
 
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ProductController>();
 
             _serviceProvider = services.BuildServiceProvider();
 
@@ -62,19 +65,6 @@ namespace App.Test
             using var scope = _serviceProvider.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<AppContext>();
             await context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE \"Products\" RESTART IDENTITY CASCADE;");
-        }
-
-        [Test]
-        public void DependencyInjection_ShouldResolveRegisteredServices()
-        {
-            using var scope = _serviceProvider.CreateScope();
-
-            var dbContext = scope.ServiceProvider.GetService<AppContext>();
-            var interfaceRepo = scope.ServiceProvider.GetService<IProductRepository>();
-
-            Assert.That(dbContext, Is.Not.Null, "AppContext should be resolved from DI.");
-            Assert.That(interfaceRepo, Is.Not.Null, "IProductRepository should be resolved from DI.");
-            Assert.That(interfaceRepo, Is.InstanceOf<ProductRepository>());
         }
 
         [Test]
@@ -196,6 +186,59 @@ namespace App.Test
             var ex = Assert.ThrowsAsync<DomainValidationException>(async () => await repository.SaveAsync());
             Assert.That(ex, Is.Not.Null);
             Assert.That(ex!.Validators.Count(), Is.EqualTo(3));
+        }
+
+        [Test]
+        public async Task PostProduct_WithValidData_ShouldCreateProductSuccessfully()
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var controller = scope.ServiceProvider.GetRequiredService<ProductController>();
+
+            var newProductDto = new ProductDTO
+            {
+                Name = "Wireless Headset",
+                Price = 89.99m,
+                Description = "High quality wireless noise cancelling headset"
+            };
+
+            var createdProduct = await controller.NewProduct(newProductDto);
+
+            Assert.That(createdProduct, Is.Not.Null);
+            Assert.That(createdProduct.Id, Is.GreaterThan(0));
+            Assert.That(createdProduct.Name, Is.EqualTo("Wireless Headset"));
+            Assert.That(createdProduct.Price, Is.EqualTo(89.99m));
+            Assert.That(createdProduct.Description, Is.EqualTo("High quality wireless noise cancelling headset"));
+
+            // Verify product is persisted in the database
+            using var verifyScope = _serviceProvider.CreateScope();
+            var verifyRepo = verifyScope.ServiceProvider.GetRequiredService<IProductRepository>();
+            var persisted = await verifyRepo.GetAsync(createdProduct.Id);
+
+            Assert.That(persisted, Is.Not.Null);
+            Assert.That(persisted!.Name, Is.EqualTo("Wireless Headset"));
+            Assert.That(persisted.Price, Is.EqualTo(89.99m));
+            Assert.That(persisted.Description, Is.EqualTo("High quality wireless noise cancelling headset"));
+        }
+
+        [Test]
+        public void PostProduct_WithInvalidData_ShouldFailValidation()
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var controller = scope.ServiceProvider.GetRequiredService<ProductController>();
+
+            var invalidProductDto = new ProductDTO
+            {
+                Name = "A",           // Invalid: less than 3 characters
+                Price = -15.0m,       // Invalid: negative price
+                Description = "Short" // Invalid: less than 10 characters
+            };
+
+            var ex = Assert.ThrowsAsync<DomainValidationException>(async () =>
+                await controller.NewProduct(invalidProductDto));
+
+            Assert.That(ex, Is.Not.Null);
+            Assert.That(ex!.Validators, Is.Not.Empty);
+            Assert.That(ex.Validators.Count(), Is.EqualTo(3));
         }
     }
 }
