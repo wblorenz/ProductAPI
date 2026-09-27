@@ -2,6 +2,8 @@
 
 A product management system built with .NET 10 and .NET Aspire.
 
+![Main Form](images/main_form.png)
+
 ### Projects
 
 - **`AspireApp.AppHost`**: Orchestrates services with .NET Aspire, provisioning the PostgreSQL database and application services.
