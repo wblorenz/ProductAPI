@@ -1,6 +1,6 @@
 import aspireLogo from '/Aspire.png';
 import './App.css';
-import ProductsTable from './ProductsTable';
+import ProductsTable from './Entities/ProductsTable';
 
 function App() {
     return (

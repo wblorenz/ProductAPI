@@ -26,7 +26,7 @@ namespace App.Database.Repositories
 
         public override async Task<List<Product>> GetAllAsync()
         {
-            return await context.Products.ToListAsync();
+            return await context.Products.OrderBy(x => x.Id).ToListAsync();
         }
     }
 }
